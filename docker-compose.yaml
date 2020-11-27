@@ -1,0 +1,61 @@
+version: '3'
+
+services:
+    traefik:
+        image: traefik:v2.3
+        command:
+        - "--api.insecure=true"
+        - "--accesslog=true"
+        - "--providers.docker=true"
+        - "--providers.docker.exposedbydefault=false"
+        - "--entrypoints.websecure.address=:443"
+        - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
+        - "--certificatesresolvers.myresolver.acme.email=nicolas.herbaut@gmail.com"
+        - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
+        - "--log.level=DEBUG"
+        ports:
+        - "443:443"
+        - "8080:8080"
+        volumes:
+        - "./letsencrypt:/letsencrypt"
+        - "/var/run/docker.sock:/var/run/docker.sock"
+        - "/var/log/traefik/:/var/log"
+        
+      
+    web-nginx:
+        image: nginx:stable-alpine
+        container_name: web-nginx
+        volumes:
+            - "./docker-web/www:/usr/share/nginx/html:rw"
+            - "./docker-web/log:/var/log/nginx"
+            - "./docker-web/nginx.conf:/etc/nginx/nginx.conf:ro"
+        ports:
+            - "127.0.0.1:8080:80"
+        depends_on:
+            - web-php
+            - traefik
+        labels:
+        - "traefik.enable=true"
+        - "traefik.http.routers.web-nginx.tls.certresolver=myresolver"
+        - "traefik.http.routers.web-nginx.rule=host(`nicolas-herbaut.fr`)"
+        - "traefik.http.routers.web-nginx.entrypoints=websecure"
+        - "traefik.http.services.web-nginx.loadbalancer.server.port=80"
+        expose:
+            - "80"
+
+    web-php:
+        build: php
+        container_name: web-php
+        volumes:
+            - "./docker-web/www:/script:rw"
+        depends_on:
+            - mariadb
+            
+    mariadb:
+        image: mariadb:10
+        container_name: mariadb
+        environment:
+            - MYSQL_ROOT_PASSWORD=root
+            - MYSQL_DATABASE=nhe
+        volumes: 
+            - "./mariadb:/var/lib/mysql"
