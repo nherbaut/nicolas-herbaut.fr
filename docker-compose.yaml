@@ -10,7 +10,7 @@ services:
         - "--providers.docker.exposedbydefault=false"
         - "--entrypoints.websecure.address=:443"
         - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
-        - "--certificatesresolvers.myresolver.acme.email=nicolas.herbaut@gmail.com"
+        - "--certificatesresolvers.myresolver.acme.email=${EMAIL}"
         - "--certificatesresolvers.myresolver.acme.storage=/letsencrypt/acme.json"
         - "--log.level=DEBUG"
         ports:
@@ -55,7 +55,7 @@ services:
         image: mariadb:10
         container_name: mariadb
         environment:
-            - MYSQL_ROOT_PASSWORD=root
-            - MYSQL_DATABASE=nhe
+            - MYSQL_ROOT_PASSWORD=${DBPASSWORD}
+            - MYSQL_DATABASE=${DBNAME}
         volumes: 
             - "./mariadb:/var/lib/mysql"
