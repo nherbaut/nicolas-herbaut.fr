@@ -5,8 +5,3 @@ package: 'Core (Experimental)'
 dependencies:
   - drupal:migrate_drupal
 hidden: true
-
-# Information added by Drupal.org packaging script on 2020-11-26
-version: '9.0.9'
-project: 'drupal'
-datestamp: 1606359811

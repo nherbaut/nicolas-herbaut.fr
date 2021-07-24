@@ -11,7 +11,7 @@ RUN docker-php-ext-configure gd \
 RUN docker-php-ext-install zip
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 COPY conf.d/opcache.ini /usr/local/etc/php/conf.d/opcache.ini
-COPY src/* /var/www/html/
+COPY etc/apache2/sites-available/000-default.conf /etc/apache2/sites-available/000-default.conf
 
 
 
